@@ -10,7 +10,7 @@ API_ID = 38984573  # O'zingizning api_id (raqam ko'rinishida)
 API_HASH = 'b23432de9f10b5e49e24d859fab7f33f'  # O'zingizning api_hash
 
 # Kuzatmoqchi bo'lgan kanal username'i ('@' belgisiz)
-TARGET_CHANNEL = 'question_prep' 
+TARGET_CHANNEL = 'sherobod_muslim' 
 
 # Post borishi kerak bo'lgan akkauntlar ro'yxati (username yoki Telegram ID)
 RECEIVER_USERS = [
