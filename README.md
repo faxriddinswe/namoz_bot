@@ -65,7 +65,6 @@ source venv/bin/activate
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
-
 ### 4. Install Requirements
 
 ```bash
