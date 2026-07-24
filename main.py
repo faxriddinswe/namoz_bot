@@ -1,54 +1,42 @@
-import asyncio
+import os
 import logging
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 
-# Konsolda nima bo'layotganini tartibli ko'rib turish uchun log sozlamalari
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# ------------------- SOZLAMALAR -------------------
-API_ID = 38984573  # O'zingizning api_id (raqam ko'rinishida)
-API_HASH = 'b23432de9f10b5e49e24d859fab7f33f'  # O'zingizning api_hash
+# Environment variable'lardan ma'lumotlarni olamiz
+API_ID = int(os.environ.get("API_ID", 0))
+API_HASH = os.environ.get("API_HASH", "")
+SESSION_STRING = os.environ.get("SESSION_STRING", "")
 
-# Kuzatmoqchi bo'lgan kanal username'i ('@' belgisiz)
-TARGET_CHANNEL = 'sherobod_muslim' 
+TARGET_CHANNEL = os.environ.get("TARGET_CHANNEL", "sherobod_muslim",)
+RECEIVER_USERS = [user.strip() for user in os.environ.get("RECEIVER_USERS", "").split(",") if user.strip()]
 
-# Post borishi kerak bo'lgan akkauntlar ro'yxati (username yoki Telegram ID)
-RECEIVER_USERS = [
-    'Mark_zukerberk',
-]
-
-# Namoz vaqtlarini aniqlovchi kalit so'zlar
 KEYWORDS = ['bomdod', 'peshin', 'asr', 'shom', 'xufton', 'namoz vaqtlari', 'taqvim']
-# --------------------------------------------------
 
-client = TelegramClient('user_session', API_ID, API_HASH)
-
+# StringSession orqali ulanamiz
+client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
 
 @client.on(events.NewMessage(chats=TARGET_CHANNEL))
 async def handle_new_post(event):
-    """
-    Kanalga yangi post tushishi bilan bir zumda ishlaydi.
-    """
     if not event.message.text:
         return
 
     text_lower = event.message.text.lower()
     
-    # Post ichida namoz vaqtlari haqida so'z borligini tekshiramiz
     if any(word in text_lower for word in KEYWORDS):
-        logging.info(f"⚡ Yangi namoz vaqti posti keldi! (Message ID: {event.message.id})")
+        logging.info(f"⚡ Yangi namoz vaqti posti keldi! (ID: {event.message.id})")
         
         for target in RECEIVER_USERS:
             try:
                 await event.message.forward_to(target)
-                logging.info(f"🚀 Xabar {target} ga avtomatik forward qilindi!")
+                logging.info(f"🚀 Xabar {target} ga yuborildi!")
             except Exception as e:
                 logging.error(f"❌ {target} ga yuborishda xatolik: {e}")
 
-
 async def main():
-    logging.info("🤖 Userbot 24/7 real-vaqt rejimida ishga tushdi.")
-    logging.info(f"📢 '{TARGET_CHANNEL}' kanali kuzatilmoqda...")
+    logging.info("🤖 Koyeb'da Userbot 24/7 rejimida ishga tushdi.")
 
 with client:
     client.loop.run_until_complete(main())
